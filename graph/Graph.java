@@ -47,7 +47,8 @@ public class Graph {
             e.printStackTrace();
             return;
         }
-        while (sc.hasNextInt()) {
+        while (sc.hasNext()) {
+            
             int i1 = sc.nextInt();
             int i2 = sc.nextInt();
             this.insert(i1);
