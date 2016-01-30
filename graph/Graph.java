@@ -47,14 +47,19 @@ public class Graph {
             e.printStackTrace();
             return;
         }
-        while (sc.hasNext()) {
-            
-            int i1 = sc.nextInt();
-            int i2 = sc.nextInt();
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine().replaceAll(":", "");
+            Scanner numSc = new Scanner(line);
+            int i1 = numSc.nextInt();
             this.insert(i1);
-            this.insert(i2);
-            this.getVertex(i1).addEdge(this.getVertex(i2));
+            while (numSc.hasNextInt()) {
+                int i2 = numSc.nextInt();
+                this.insert(i2);
+                this.getVertex(i1).addEdge(this.getVertex(i2));
+            }
+            numSc.close();
         }
+        sc.close();
     }
 
     public List<Vertex> getVertices() {
@@ -63,7 +68,7 @@ public class Graph {
 
     public static void main(String[] args) {
         Graph g = new Graph();
-        g.readEdges("0.edges");
+        g.readEdges("graph/0.egonet");
         int highDegree = 0;
         Vertex highVertex = null;
         for (Vertex v : g.getVertices()) {
