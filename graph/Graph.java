@@ -3,8 +3,10 @@ package graph;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Graph {
     private List<Vertex> vertices;
@@ -108,14 +110,37 @@ public class Graph {
                 continue;
             }
             double currDensity = calculateDensity(ret);
-            System.out.println(currDensity);
             if (currDensity <= density) {
                 ret.remove(v);
             } else {
                 density = currDensity;
             }
         }
+
+        for (int i = 0; i < ret.size(); i++) {
+            ret.set(i, this.getVertex(ret.get(i).getVal()));
+        }
         return ret;
+    }
+
+    public static void printList(List<Vertex> lst) {
+        System.out.print("[");
+        for (Vertex v : lst) {
+            System.out.print(v.getVal() + ", ");
+        }
+        System.out.println("]");
+    }
+
+    public List<Vertex> findFriends(int start) {
+        List<Vertex> startSubgraph = largestDenseNetwork(start);
+        printList(startSubgraph);
+        Vertex highest = getLargestDegree(startSubgraph, start);
+        List<Vertex> highSubgraph = largestDenseNetwork(highest);
+        printList(highSubgraph);
+        Set<Vertex> startSet = new HashSet<Vertex>(startSubgraph);
+        Set<Vertex> highSet = new HashSet<Vertex>(highSubgraph);
+        System.out.println(highSet.removeAll(startSet));
+        return new ArrayList<Vertex>(highSet);
     }
 
     public List<Vertex> getVertices() {
@@ -125,9 +150,21 @@ public class Graph {
     public static void main(String[] args) {
         Graph g = new Graph();
         g.readEdges("graph/0.egonet");
-        List<Vertex> dense = g.largestDenseNetwork(5);
-        for (Vertex v : dense) {
+        List<Vertex> friends = g.findFriends(1);
+        for (Vertex v : friends) {
             System.out.println(v.getVal());
         }
+    }
+
+    public static Vertex getLargestDegree(List<Vertex> lst, int start) {
+        int max = 0;
+        Vertex curr = null;
+        for (int i = 0; i < lst.size(); i++) {
+            if (lst.get(i).degree() > max && lst.get(i).getVal() != start) {
+                curr = lst.get(i);
+                max = curr.degree();
+            }
+        }
+        return curr;
     }
 }
