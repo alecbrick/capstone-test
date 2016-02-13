@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 public class GraphLoader {
-    public static void loadGraph(warmup.Graph g, String filename) {
+    public static void loadGraph(graph.Graph g, String filename) {
         Set<Integer> seen = new HashSet<Integer>();
         Scanner sc;
         try {

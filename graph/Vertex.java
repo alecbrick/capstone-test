@@ -7,6 +7,11 @@ import java.util.ArrayList;
 public class Vertex implements Comparable<Vertex> {
     List<Edge> edges;
     int val;
+    public int layer = 0;
+    public List<Vertex> parents = new ArrayList<Vertex>();
+    public boolean visited = false;
+    public float flow = 1;
+    public int pathCount = 0;
 
     public Vertex(int val) {
         this.val = val;
@@ -23,13 +28,20 @@ public class Vertex implements Comparable<Vertex> {
         }
     }
 
-    public int getVal() {
-        return val;
+    public void reset() {
+        layer = 0;
+        parents = new ArrayList<Vertex>();
+        visited = false;
+        flow = 1;
+        pathCount = 0;
     }
 
-    @Override
-    public boolean equals(Object v) {
-        return val == ((Vertex) v).getVal();
+    public void visit() {
+        visited = true;
+    }
+
+    public int getVal() {
+        return val;
     }
 
     public void addEdge(Vertex v) {
@@ -73,8 +85,22 @@ public class Vertex implements Comparable<Vertex> {
         return edges;
     }
 
+    public Edge getEdge(Vertex v) {
+        for (Edge e : edges) {
+            if (e.getOtherVertex(this) == v) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Edge not found!");
+    }
+
     public int compareTo(Vertex v) {
-        return v.getEdges().size() - edges.size();
+        return v.layer - layer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return val == ((Vertex)o).getVal();
     }
 
     public static Comparator<Vertex> VertexComparator = new Comparator<Vertex>() {
