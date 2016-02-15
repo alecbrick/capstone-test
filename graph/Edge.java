@@ -18,6 +18,10 @@ public class Edge {
         return v2;
     }
 
+    public void setFlow(float f) {
+        flow = f;
+    }
+
     public Vertex getOtherVertex(Vertex v) {
         if (v.equals(v1)) {
             return v2;

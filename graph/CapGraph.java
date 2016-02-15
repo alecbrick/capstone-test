@@ -167,10 +167,8 @@ public class CapGraph implements Graph {
     }
 
     // BFS through the graph, keeping track of path count and layer.
-    public void bfs(Vertex start) {
-        for (Vertex v : vertices) {
-            v.reset();
-        }
+    public List<Vertex> bfs(Vertex start) {
+        ArrayList<Vertex> ret = new ArrayList<Vertex>();
 
         Queue<Vertex> q = new LinkedList<Vertex>();
         q.add(start);
@@ -179,6 +177,7 @@ public class CapGraph implements Graph {
         while (!q.isEmpty()) {
             Vertex curr = q.remove();
             if (!curr.visited) {
+                ret.add(curr);
                 curr.visited = true;
                 for (Edge e : curr.getEdges()) {
                     Vertex neighbor = e.getOtherVertex(curr);
@@ -195,6 +194,7 @@ public class CapGraph implements Graph {
                 }
             }
         }
+        return ret;
     }
 
     public void findFlow() {
@@ -214,37 +214,112 @@ public class CapGraph implements Graph {
     public void findPartitions() {
         // Calculate flow from each vertex
         for (Vertex v : vertices) {
+            resetVertices();
             bfs(v);
             findFlow();
         }
 
-        Queue<Edge> q = new PriorityQueue<Edge>(10, new Comparator<Edge>() {
-            public int compare(Edge e1, Edge e2) {
-                return (int)(e1.flow - e2.flow);
-            }
-        });
+        float max = 0;
+        Edge maxEdge = null;
 
         for (Vertex v : vertices) {
             for (Edge e : v.getEdges()) {
-                if (q.size() < 10) {
-                    q.add(e);
-                } else if (e.flow > q.peek().flow) {
-                    q.poll();
-                    q.add(e);
+                if (e.flow > max) {
+                    maxEdge = e;
+                    max = e.flow;
                 }
             }
         }
 
-        for (Edge e : q) {
-            System.out.println(e.getV1().getVal() + " to " + e.getV2().getVal() + ": " + e.flow);
+        // partition
+        Edge e = maxEdge;
+        System.out.println(e.getV1().getVal() + " to " + e.getV2().getVal() + ": " + e.flow);
+        e.getV1().removeEdge(e.getV2());
+        e.getV2().removeEdge(e.getV1());
+    }
+
+    // Clears vertex information such as visited, layer, etc.
+    public void resetVertices() {
+        for (Vertex v : vertices) {
+            v.reset();
         }
     }
 
+    public void resetEdges() {
+        for (Vertex v : vertices) {
+            for (Edge e : v.getEdges()) {
+                e.setFlow(0);
+            }
+        }
+    }
+
+    public void petition(int amount) {
+        int count = countPartitions();
+        while (count < amount) {
+            count = 0;
+            findPartitions();
+            resetVertices();
+            resetEdges();
+            for (Vertex v : vertices) {
+                if (!v.visited) {
+                    count++;
+                    bfs(v);
+                }
+            }
+        }
+
+        count = 0;
+        resetVertices();
+        for (Vertex v : vertices) {
+            if (!v.visited) {
+                System.out.println("Vertex: " + v.getVal());
+                count++;
+                List<Vertex> ret = bfs(v);
+                System.out.println("Partition #" + count + ": " + printListString(ret));
+            }
+        }
+    } 
+
+    public int countPartitions() {
+        int count = 0;
+        resetVertices();
+        for (Vertex v : vertices) {
+            if (!v.visited) {
+                count++;
+                bfs(v);
+            }
+        }
+        return count;
+    }
 
     public static void main(String[] args) {
+        String filename = "test.txt";
+        int amount = 2;
+        if (args.length > 0) {
+            if (args[0].equals("--help")) {
+                System.out.println("Usage:\n\tjava graph.CapGraph [[filename=test.txt] [partitions=2]]");
+                return;
+            }
+            filename = args[0];
+            if (args.length > 1) {
+                amount = Integer.parseInt(args[1]);
+            }
+        }
         CapGraph g = new CapGraph();
-        GraphLoader.loadGraph(g, "data/facebook_1000.txt");
-        g.findPartitions();
+        GraphLoader.loadGraph(g, "data/" + filename);
+        g.petition(amount);
+            
+    }
+
+    public static String printListString (List<Vertex> lst) {
+        String ret = "";
+        for (int i = 0; i < lst.size(); i++) {
+            ret += lst.get(i).getVal();
+            if (i < lst.size() - 1) {
+                ret += ", ";
+            }
+        }
+        return ret;
     }
 
     public static Vertex getLargestDegree(List<Vertex> lst, int start) {

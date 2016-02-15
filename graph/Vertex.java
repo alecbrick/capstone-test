@@ -15,12 +15,12 @@ public class Vertex implements Comparable<Vertex> {
 
     public Vertex(int val) {
         this.val = val;
-        edges = new ArrayList();
+        edges = new ArrayList<Edge>();
     }
 
     public Vertex(Vertex v, List<Vertex> allowed) {
         this.val = v.getVal();
-        edges = new ArrayList();
+        edges = new ArrayList<Edge>();
         for (Edge e : v.getEdges()) {
             if (allowed.contains(e.getOtherVertex(v))) {
                 edges.add(e);
@@ -42,6 +42,15 @@ public class Vertex implements Comparable<Vertex> {
 
     public int getVal() {
         return val;
+    }
+
+    public void removeEdge(Vertex v) {
+        for (Edge e : edges) {
+            if (e.getOtherVertex(this).equals(v)) {
+                edges.remove(e);
+                return;
+            }
+        }
     }
 
     public void addEdge(Vertex v) {
@@ -68,7 +77,7 @@ public class Vertex implements Comparable<Vertex> {
     }
 
     public List<Vertex> getNeighbors() {
-        ArrayList<Vertex> ret = new ArrayList();
+        List<Vertex> ret = new ArrayList<Vertex>();
         for (Edge e : edges) {
             ret.add(e.getOtherVertex(this));
         }
