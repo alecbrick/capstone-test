@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -53,6 +54,7 @@ public class CapGraph implements Graph {
         insert(i);
     }
 
+
     public void addEdge(int from, int to) {
         this.getVertex(from).addEdge(this.getVertex(to));
     }
@@ -66,6 +68,19 @@ public class CapGraph implements Graph {
         return null;
     }
 
+    public static void printGraph(CapGraph graph) {
+        List<Vertex> vertices = graph.getVertices();
+        for(Vertex vertex : vertices) {
+            System.out.print("\n"+vertex.getVal() + " : ");
+            
+            for(Edge edge : vertex.getEdges()) {
+                System.out.print(edge.getOtherVertex(vertex).getVal() + " ");
+            }
+            System.out.print("\n");
+        }
+        
+    }
+    
     public void readEdges(String file) {
         Scanner sc;
         try {
@@ -294,9 +309,9 @@ public class CapGraph implements Graph {
     }
 
     public static void main(String[] args) {
-        String filename = "test.txt";
+        String filename = "scctest.txt";
         int amount = 2;
-        if (args.length > 0) {
+        /*if (args.length > 0) {
             if (args[0].equals("--help")) {
                 System.out.println("Usage:\n\tjava graph.CapGraph [[filename=test.txt] [partitions=2]]");
                 return;
@@ -305,11 +320,25 @@ public class CapGraph implements Graph {
             if (args.length > 1) {
                 amount = Integer.parseInt(args[1]);
             }
-        }
+        }*/
         CapGraph g = new CapGraph();
         GraphLoader.loadGraph(g, "data/" + filename);
-        g.petition(amount);
+        //g.petition(amount);
+
+        List<Set<Vertex>> sccs = g.getSCCs();
+
+        for(int i = 0; i < sccs.size(); i++) {
+            Set<Vertex> scc = sccs.get(i);
+            System.out.print("scc " + (i+1) + " : ");
+            for(Vertex v : scc) {
+                System.out.print(v.getVal() + "  ");
+            }
+            System.out.print("\n");
+        }
+
             
+
+
     }
 
     public static String printListString (List<Vertex> lst) {
@@ -342,21 +371,87 @@ public class CapGraph implements Graph {
 
     // SCC FINDING ===================================================
 
-    public List<Graph> getSCCs() {
-        return new ArrayList<Graph>();
+    public List<Set<Vertex>> getSCCs() {
+        List<Set<Vertex>> sccs = new ArrayList<Set<Vertex>>();
+        CapGraph gReverse = CapGraph.getReverseGraph(this);
+        List<Vertex> postList = new ArrayList<Vertex>();
+
+        gReverse.dfs(postList);
+
+        this.resetVertices();
+
+        for(Vertex vertex : postList) {
+            // maybe use getVertex
+            if(!getVertex(vertex.getVal()).visited) {
+                sccs.add(findSCC(vertex.getVal()));
+            }
+        }
+
+        return sccs;
     }
 
-    public static Graph getReverseGraph(Graph g) {
-        Graph gReverse = new CapGraph();
+    public static Comparator<Vertex> valComparator = new Comparator<Vertex>() {
+        public int compare(Vertex v1, Vertex v2) {
+            return v1.getVal() - v2.getVal();
+        }
+    };
+
+    // finds SCC given a valid vertex
+    private Set<Vertex> findSCC(int val) {
         
-        for(Vertex vertex : g.vertices) {
+
+        Set<Vertex> scc = new TreeSet<Vertex>(valComparator);
+        Stack<Vertex> stack = new Stack<Vertex>();
+        Vertex working = null;
+
+        stack.push(getVertex(val));
+        while(!stack.empty()) {
+            working = stack.pop();
+
+            if(!working.visited) {
+                working.visited = true;
+                
+                scc.add(working);
+
+
+                for(Edge edge : working.getEdges()) {
+                    if(!edge.getOtherVertex(working).visited) {
+                        stack.push(edge.getOtherVertex(working));
+                    }
+                }
+            }
+        }
+
+
+        return scc;
+    }
+
+    public static CapGraph getReverseGraph(CapGraph g) {
+        CapGraph gReverse = new CapGraph();
+        Vertex other  = null;
+
+        for(Vertex vertex : g.getVertices()) {
+            if(!gReverse.contains(vertex.getVal())) {
+                gReverse.addVertex(vertex.getVal());
+            }
+            
+            for(Edge edge : vertex.getEdges()) {
+                other = edge.getOtherVertex(vertex);
+                if(!gReverse.contains(other.getVal())) {
+                    gReverse.addVertex(other.getVal());
+                }
+
+                gReverse.getVertex(other.getVal())
+                    .addEdge(gReverse.getVertex(vertex.getVal()));
+
+            }       
+
 
         }
 
         return gReverse;
     }
         
-
     public void dfs(List<Vertex> postList) {
         resetVertices();
         Integer clk = 0;
@@ -391,7 +486,7 @@ public class CapGraph implements Graph {
             else {
                 if(working.post == 0) {
                     working.post = clk;
-                    postList.add(working);
+                    postList.add(0, working);
                 }
             }
 

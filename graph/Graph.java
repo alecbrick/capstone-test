@@ -1,6 +1,7 @@
 package graph;
 
 import java.util.List;
+import java.util.Set;
 
 public interface Graph {
     /* Creates a vertex with the given number. */
@@ -14,5 +15,5 @@ public interface Graph {
 
     /* Returns all SCCs in a directed graph. Don't worry about handling
      * this for undirected graphs. */
-    public List<Graph> getSCCs();
+    public List<Set<Vertex>> getSCCs();
 } 
