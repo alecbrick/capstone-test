@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
@@ -374,7 +375,74 @@ public class CapGraph implements Graph {
         return new CapGraph(friends);
     }
 
+
+    // SCC FINDING ===================================================
+
     public List<Graph> getSCCs() {
         return new ArrayList<Graph>();
     }
+
+    public static Graph getReverseGraph(Graph g) {
+        Graph gReverse = new CapGraph();
+        
+        for(Vertex vertex : g.vertices) {
+
+        }
+
+        return gReverse;
+    }
+        
+
+    public void dfs(List<Vertex> postList) {
+        resetVertices();
+        Integer clk = 0;
+        
+        for(Vertex vertex : vertices) {
+            if(!vertex.visited) {
+                explore(vertex, postList, clk);
+            }
+        }
+    }
+
+    /**
+     * performs dfs explore from start Vertex
+     */
+    public void explore(Vertex start, List<Vertex> postList, Integer clk) {
+        Stack<Vertex> vStack = new Stack<Vertex>();
+
+
+        Vertex working;
+
+        // add start vertex to stack
+        vStack.push(start);
+        while(!vStack.empty()) {
+            working = vStack.pop();
+
+            if(!working.visited) {
+                // push back on stack so post number will get set
+                vStack.push(working);
+                working.visited = true;
+                working.pre = clk;
+            }
+            else {
+                if(working.post == 0) {
+                    working.post = clk;
+                    postList.add(working);
+                }
+            }
+
+            clk++;
+
+            for(Edge edge : working.edges) {
+                if(!edge.getOtherVertex(working).visited) {
+                    vStack.push(edge.getOtherVertex(working));
+                }
+            }
+        }       
+    }
+
+
+
+
+
 }

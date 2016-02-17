@@ -12,6 +12,8 @@ public class Vertex implements Comparable<Vertex> {
     public boolean visited = false;
     public float flow = 1;
     public int pathCount = 0;
+    public int pre = 0;
+    public int post = 0;
 
     public Vertex(int val) {
         this.val = val;
@@ -34,6 +36,8 @@ public class Vertex implements Comparable<Vertex> {
         visited = false;
         flow = 1;
         pathCount = 0;
+        pre = 0;
+        post = 0;
     }
 
     public void visit() {
