@@ -15,4 +15,7 @@ public interface Graph {
     /* Returns all SCCs in a directed graph. Don't worry about handling
      * this for undirected graphs. */
     public List<Graph> getSCCs();
+    
+    /* Return the graph's connections in a printable format. */
+    public String printGraph();
 } 
