@@ -384,10 +384,11 @@ public class CapGraph implements Graph {
 
     public static Graph getReverseGraph(Graph g) {
         Graph gReverse = new CapGraph();
-        
+        /*
         for(Vertex vertex : g.vertices) {
 
         }
+        */
 
         return gReverse;
     }
