@@ -364,8 +364,44 @@ public class CapGraph implements Graph {
         return curr;
     }
 
+    public String printGraph() {
+        List<Vertex> newVertices = new ArrayList<Vertex>(vertices);
+        String ret = "";
+        Collections.sort(newVertices, new Comparator<Vertex>() {
+            @Override
+            public int compare(Vertex v1, Vertex v2) {
+                return v1.getVal() - v2.getVal();
+            }
+        });
+
+        for (Vertex v : newVertices) {
+            ret += v.getVal() + ": ";
+            List<Edge> newEdges = new ArrayList<Edge>(v.getEdges());
+            Collections.sort(newEdges, new Comparator<Edge>() {
+                @Override
+                public int compare(Edge e1, Edge e2) {
+                    return e1.getV2().getVal() - e2.getV2().getVal();
+                }
+            });
+
+            for (int i = 0; i < newEdges.size(); i++) {
+                ret += newEdges.get(i).getV2().getVal();
+                if (i < newEdges.size() - 1) {
+                    ret += ", ";
+                }
+            }
+            ret += "\n";
+        }
+        return ret;
+    }
+
     public Graph getEgonet(int center) {
-        return new CapGraph();
+        Vertex start = getVertex(center);
+        List<Vertex> friends = new ArrayList<Vertex>();
+        for (Edge e : start.getEdges()) {
+            friends.add(e.getV2());
+        }
+        return new CapGraph(friends);
     }
 
 
@@ -445,9 +481,6 @@ public class CapGraph implements Graph {
                     .addEdge(gReverse.getVertex(vertex.getVal()));
 
             }       
-
-
-        }
 
         return gReverse;
     }
