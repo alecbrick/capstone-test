@@ -367,12 +367,7 @@ public class CapGraph implements Graph {
     public String printGraph() {
         List<Vertex> newVertices = new ArrayList<Vertex>(vertices);
         String ret = "";
-        Collections.sort(newVertices, new Comparator<Vertex>() {
-            @Override
-            public int compare(Vertex v1, Vertex v2) {
-                return v1.getVal() - v2.getVal();
-            }
-        });
+        Collections.sort(newVertices, valComparator);
 
         for (Vertex v : newVertices) {
             ret += v.getVal() + ": ";
@@ -481,6 +476,7 @@ public class CapGraph implements Graph {
                     .addEdge(gReverse.getVertex(vertex.getVal()));
 
             }       
+        }
 
         return gReverse;
     }
