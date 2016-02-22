@@ -311,7 +311,7 @@ public class CapGraph implements Graph {
     public static void main(String[] args) {
         String filename = "scctest.txt";
         int amount = 2;
-        /*if (args.length > 0) {
+        if (args.length > 0) {
             if (args[0].equals("--help")) {
                 System.out.println("Usage:\n\tjava graph.CapGraph [[filename=test.txt] [partitions=2]]");
                 return;
@@ -320,7 +320,7 @@ public class CapGraph implements Graph {
             if (args.length > 1) {
                 amount = Integer.parseInt(args[1]);
             }
-        }*/
+        }
         CapGraph g = new CapGraph();
         GraphLoader.loadGraph(g, "data/" + filename);
         //g.petition(amount);
@@ -434,7 +434,7 @@ public class CapGraph implements Graph {
         Set<Vertex> scc = new TreeSet<Vertex>(valComparator);
         Stack<Vertex> stack = new Stack<Vertex>();
         Vertex working = null;
-
+        
         stack.push(getVertex(val));
         while(!stack.empty()) {
             working = stack.pop();
@@ -494,6 +494,8 @@ public class CapGraph implements Graph {
 
     /**
      * performs dfs explore from start Vertex
+     * fills postList with vertices in order of decreasing post number
+     *
      */
     public void explore(Vertex start, List<Vertex> postList, Integer clk) {
         Stack<Vertex> vStack = new Stack<Vertex>();
@@ -512,11 +514,11 @@ public class CapGraph implements Graph {
                 working.visited = true;
                 working.pre = clk;
             }
-            else {
-                if(working.post == 0) {
-                    working.post = clk;
-                    postList.add(0, working);
-                }
+            else if(working.post == 0) {
+
+                working.post = clk;
+                postList.add(0, working);
+                
             }
 
             clk++;
