@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.LinkedList;
@@ -12,33 +13,30 @@ import java.util.Stack;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.TreeMap;
 import util.GraphLoader;
 
 public class CapGraph implements Graph {
-    private List<Vertex> vertices;
+    private Map<Integer, Vertex> vertices;
     
     public CapGraph() {
-        vertices = new ArrayList<Vertex>();
+        vertices = new HashMap<Integer, Vertex>();
     }
 
     /** Given a list of vertices from an old graph,
      *  creates a new graph containing only those vertices.
      */
     public CapGraph(List<Vertex> allowed) {
-        vertices = new ArrayList<Vertex>();
+        vertices = new HashMap<Integer, Vertex>();
         for (Vertex v : allowed) {
-            vertices.add(new Vertex(v, allowed));
+            vertices.put(v.getVal(), v);
         }
     }
 
     public boolean contains(int i) {
-        for (Vertex v : vertices) {
-            if (v.getVal() == i) {
-                return true;
-            }
-        }
-        return false;
+        return vertices.containsKey(i);
     }
 
     public boolean insert(int i) {
@@ -46,7 +44,7 @@ public class CapGraph implements Graph {
             return false;
         }
         Vertex v = new Vertex(i);
-        vertices.add(v);
+        vertices.put(i, v);
         return true;
     }
 
@@ -60,21 +58,19 @@ public class CapGraph implements Graph {
     }
 
     public Vertex getVertex(int i) {
-        for (Vertex v : vertices) {
-            if (v.getVal() == i) {
-                return v;
-            }
-        }
-        return null;
+        return vertices.get(i);
     }
 
     public static void printGraph(CapGraph graph) {
-        List<Vertex> vertices = graph.getVertices();
-        for(Vertex vertex : vertices) {
-            System.out.print("\n"+vertex.getVal() + " : ");
+        Map<Integer, Vertex> vertices = graph.getVertices();
+        
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
+
+            System.out.print("\n"+v.getVal() + " : ");
             
-            for(Edge edge : vertex.getEdges()) {
-                System.out.print(edge.getOtherVertex(vertex).getVal() + " ");
+            for(Edge edge : v.getEdges()) {
+                System.out.print(edge.getOtherVertex(v).getVal() + " ");
             }
             System.out.print("\n");
         }
@@ -126,7 +122,7 @@ public class CapGraph implements Graph {
 
     public List<Vertex> largestDenseNetwork(Vertex start) {
         CapGraph g = new CapGraph(start.getNeighborsAndThis());
-        List<Vertex> neighbors = g.getVertices();
+        List<Vertex> neighbors = new ArrayList<Vertex>(g.getVertices().values());
         Collections.sort(neighbors, Vertex.VertexComparator);
         List<Vertex> ret = new ArrayList<Vertex>();
         double density = 0;
@@ -178,7 +174,7 @@ public class CapGraph implements Graph {
         return new ArrayList<Vertex>(highSet);
     }
 
-    public List<Vertex> getVertices() {
+    public Map<Integer, Vertex> getVertices() {
         return vertices;
     }
 
@@ -215,7 +211,7 @@ public class CapGraph implements Graph {
 
     public void findFlow() {
         // so in-place sort doesn't mess up old order
-        List<Vertex> vertexCopy = new ArrayList<Vertex>(vertices);
+        List<Vertex> vertexCopy = new ArrayList<Vertex>(((HashMap<Integer, Vertex>)vertices).values());
         Collections.sort(vertexCopy);
         for (Vertex v : vertexCopy) {
             for (Vertex p : v.parents) {
@@ -229,7 +225,8 @@ public class CapGraph implements Graph {
 
     public void findPartitions() {
         // Calculate flow from each vertex
-        for (Vertex v : vertices) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
             resetVertices();
             bfs(v);
             findFlow();
@@ -238,7 +235,8 @@ public class CapGraph implements Graph {
         float max = 0;
         Edge maxEdge = null;
 
-        for (Vertex v : vertices) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
             for (Edge e : v.getEdges()) {
                 if (e.flow > max) {
                     maxEdge = e;
@@ -256,13 +254,15 @@ public class CapGraph implements Graph {
 
     // Clears vertex information such as visited, layer, etc.
     public void resetVertices() {
-        for (Vertex v : vertices) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
             v.reset();
         }
     }
 
     public void resetEdges() {
-        for (Vertex v : vertices) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
             for (Edge e : v.getEdges()) {
                 e.setFlow(0);
             }
@@ -276,7 +276,8 @@ public class CapGraph implements Graph {
             findPartitions();
             resetVertices();
             resetEdges();
-            for (Vertex v : vertices) {
+            for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+                Vertex v = entry.getValue();
                 if (!v.visited) {
                     count++;
                     bfs(v);
@@ -286,7 +287,8 @@ public class CapGraph implements Graph {
 
         count = 0;
         resetVertices();
-        for (Vertex v : vertices) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
             if (!v.visited) {
                 System.out.println("Vertex: " + v.getVal());
                 count++;
@@ -299,7 +301,8 @@ public class CapGraph implements Graph {
     public int countPartitions() {
         int count = 0;
         resetVertices();
-        for (Vertex v : vertices) {
+        for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
             if (!v.visited) {
                 count++;
                 bfs(v);
@@ -365,11 +368,13 @@ public class CapGraph implements Graph {
     }
 
     public String printGraph() {
-        List<Vertex> newVertices = new ArrayList<Vertex>(vertices);
+        // add vertices to tree map sorted by integer key values
+        TreeMap<Integer, Vertex> newVertices = 
+                new TreeMap<Integer, Vertex>(getVertices());
         String ret = "";
-        Collections.sort(newVertices, valComparator);
 
-        for (Vertex v : newVertices) {
+        for (Map.Entry<Integer, Vertex> entry : newVertices.entrySet()) {
+            Vertex v = entry.getValue();
             ret += v.getVal() + ": ";
             List<Edge> newEdges = new ArrayList<Edge>(v.getEdges());
             Collections.sort(newEdges, new Comparator<Edge>() {
@@ -461,19 +466,16 @@ public class CapGraph implements Graph {
         CapGraph gReverse = new CapGraph();
         Vertex other  = null;
 
-        for(Vertex vertex : g.getVertices()) {
-            if(!gReverse.contains(vertex.getVal())) {
-                gReverse.addVertex(vertex.getVal());
-            }
+        for (Map.Entry<Integer, Vertex> entry : g.getVertices().entrySet()) {
+            Vertex v = entry.getValue();
+            gReverse.insert(v.getVal());
             
-            for(Edge edge : vertex.getEdges()) {
-                other = edge.getOtherVertex(vertex);
-                if(!gReverse.contains(other.getVal())) {
-                    gReverse.addVertex(other.getVal());
-                }
+            for(Edge edge : v.getEdges()) {
+                other = edge.getOtherVertex(v);
+                gReverse.insert(other.getVal());
 
                 gReverse.getVertex(other.getVal())
-                    .addEdge(gReverse.getVertex(vertex.getVal()));
+                    .addEdge(gReverse.getVertex(v.getVal()));
 
             }       
         }
@@ -485,9 +487,10 @@ public class CapGraph implements Graph {
         resetVertices();
         Integer clk = 0;
         
-        for(Vertex vertex : vertices) {
-            if(!vertex.visited) {
-                explore(vertex, postList, clk);
+        for (Map.Entry<Integer, Vertex> entry : getVertices().entrySet()) {
+            Vertex v = entry.getValue();
+            if(!v.visited) {
+                explore(v, postList, clk);
             }
         }
     }
