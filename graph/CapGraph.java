@@ -269,7 +269,7 @@ public class CapGraph implements Graph {
         }
     }
 
-    public void petition(int amount) {
+    public void partition(int amount) {
         int count = countPartitions();
         while (count < amount) {
             count = 0;
@@ -312,7 +312,7 @@ public class CapGraph implements Graph {
     }
 
     public static void main(String[] args) {
-        String filename = "scctest.txt";
+        String filename = "facebook_ucsd.txt";
         int amount = 2;
         if (args.length > 0) {
             if (args[0].equals("--help")) {
@@ -326,9 +326,10 @@ public class CapGraph implements Graph {
         }
         CapGraph g = new CapGraph();
         GraphLoader.loadGraph(g, "data/" + filename);
-        //g.petition(amount);
+        //g.partition(amount);
 
         List<Set<Integer>> sccs = g.getSCCs();
+        /*
 
         for(int i = 0; i < sccs.size(); i++) {
             Set<Integer> scc = sccs.get(i);
@@ -338,11 +339,43 @@ public class CapGraph implements Graph {
             }
             System.out.print("\n");
         }
+        */
+
+        List<Vertex> ret = g.findPossibleFriends(1);
+        for (Vertex v : ret) {
+            System.out.println(v.getVal());
+        }
 
             
 
 
     }
+
+    // EASY QUESTION ======================================
+    public List<Vertex> findPossibleFriends (int vertex) {
+        Vertex start = getVertex(vertex);
+        List<Vertex> ret = new ArrayList<Vertex>();
+        List<Vertex> neighbors = start.getNeighbors();
+        resetVertices();
+        // Loop through all the neighbors, finding neighbors of
+        // neighbors who aren't friends with the starting vertex
+        for (Vertex v : neighbors) {
+            v.visited = true;
+        }
+        for (Vertex v : neighbors) {
+            for (Vertex v2 : v.getNeighbors()) {
+                if (!v2.visited && (v2 != start)) {
+                    ret.add(v2);
+                    v2.visited = true;
+                }
+            }
+        }
+        System.out.println("Neighbors size: " + neighbors.size());
+        System.out.println("Ret size: " + ret.size());
+        return ret;
+    }
+    // ===========================================================
+
 
     public static String printListString (List<Vertex> lst) {
         String ret = "";
