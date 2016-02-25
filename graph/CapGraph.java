@@ -328,13 +328,13 @@ public class CapGraph implements Graph {
         GraphLoader.loadGraph(g, "data/" + filename);
         //g.petition(amount);
 
-        List<Set<Vertex>> sccs = g.getSCCs();
+        List<Set<Integer>> sccs = g.getSCCs();
 
         for(int i = 0; i < sccs.size(); i++) {
-            Set<Vertex> scc = sccs.get(i);
+            Set<Integer> scc = sccs.get(i);
             System.out.print("scc " + (i+1) + " : ");
-            for(Vertex v : scc) {
-                System.out.print(v.getVal() + "  ");
+            for(Integer val : scc) {
+                System.out.print( val + "  ");
             }
             System.out.print("\n");
         }
@@ -407,8 +407,8 @@ public class CapGraph implements Graph {
 
     // SCC FINDING ===================================================
 
-    public List<Set<Vertex>> getSCCs() {
-        List<Set<Vertex>> sccs = new ArrayList<Set<Vertex>>();
+    public List<Set<Integer>> getSCCs() {
+        List<Set<Integer>> sccs = new ArrayList<Set<Integer>>();
         CapGraph gReverse = CapGraph.getReverseGraph(this);
         List<Vertex> postList = new ArrayList<Vertex>();
 
@@ -433,10 +433,10 @@ public class CapGraph implements Graph {
     };
 
     // finds SCC given a valid vertex
-    private Set<Vertex> findSCC(int val) {
+    private Set<Integer> findSCC(int val) {
         
 
-        Set<Vertex> scc = new TreeSet<Vertex>(valComparator);
+        Set<Integer> scc = new TreeSet<Integer>();
         Stack<Vertex> stack = new Stack<Vertex>();
         Vertex working = null;
         
@@ -447,7 +447,7 @@ public class CapGraph implements Graph {
             if(!working.visited) {
                 working.visited = true;
                 
-                scc.add(working);
+                scc.add(working.getVal());
 
 
                 for(Edge edge : working.getEdges()) {

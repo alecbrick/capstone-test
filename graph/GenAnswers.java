@@ -18,14 +18,14 @@ public class GenAnswers {
             try {
                 GraphLoader.loadGraph(g, "data/scc/T" + (i +1));
                 PrintWriter pw = new PrintWriter("data/sccAnswers/answer" + (i + 1));
-                List<Set<Vertex>> sccs = g.getSCCs();
+                List<Set<Integer>> sccs = g.getSCCs();
 
                 // loop over SCCs
                 for(int j = 0; j < sccs.size(); j++) {
 
-                    Set<Vertex> scc = sccs.get(j);
-                    for(Vertex v : scc) {
-                        pw.print(v.getVal() + " ");
+                    Set<Integer> scc = sccs.get(j);
+                    for(Integer val : scc) {
+                        pw.print(val + " ");
                     }
                     pw.print("\n");
                 }
