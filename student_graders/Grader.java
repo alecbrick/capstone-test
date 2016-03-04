@@ -13,16 +13,15 @@ public abstract class Grader implements Runnable {
     public String feedback = "";
     public int correct = 0;
     protected static final int TESTS = 10;
-    public PrintWriter out;
 
-    /* Formats output to be readable by Coursera */
-    public static String makeJson(double score, String feedback) {
-        return "{\"fractionalScore\": " + score + ", \"feedback\": \"" + feedback + "\"}";
+    /* Formats output to look nice */
+    public static String makeOutput(double score, String feedback) {
+        return "Score: " + score + "\nFeedback:" + feedback;
     }
 
     /* Print test descriptions neatly */
     public static String appendFeedback(int num, String test) {
-        return "\\n**Test #" + num + ": " + test + "...";
+        return "\n**Test #" + num + ": " + test + "...";
     }
 
     

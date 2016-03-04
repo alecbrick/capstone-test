@@ -1,3 +1,9 @@
+/**
+ * @author UCSD MOOC development team
+ * 
+ * Utility class to add vertices and edges to a graph
+ *
+ */
 package util;
 
 import java.io.File;

@@ -41,21 +41,12 @@ public class SCCGrader extends Grader {
         if (infinite) {
             grader.feedback += "Your program entered an infinite loop or took longer than 30 seconds to finish.";
         }
-        grader.out.println(makeJson((double)grader.testsPassed/grader.totalTests, grader.feedback));
-        grader.out.close();
+        System.out.println(makeOutput((double)grader.testsPassed/grader.totalTests, grader.feedback));
     }
 
     @Override
     public void run() {
         try {
-            out = new PrintWriter("output.out");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        try {
-            
             for(int i = 0; i < 10; i++) {
                 CapGraph g = new CapGraph();
                 Set<Integer> vertices;
@@ -63,7 +54,7 @@ public class SCCGrader extends Grader {
                 String answerFile = "data/scc_answers/answer" + (i + 1);
                 GraphLoader.loadGraph(g, "data/scc/T" + (i +1));
                 BufferedReader br = new BufferedReader(new FileReader(answerFile));
-                feedback += appendFeedback(i + 1, "\\nGRAPH: T" + (i + 1));
+                feedback += appendFeedback(i + 1, "\nGRAPH: T" + (i + 1));
 
                 // build list from answer
                 List<Set<Integer>> answer = new ArrayList<Set<Integer>>();
@@ -109,19 +100,6 @@ public class SCCGrader extends Grader {
                         scc = sccs.get(j);
                     }
                         
-                    //vertices = answer.get(j);
-
-                    
-                    /* QUESTION ::: how should credit be given? i
-                     * partial, all or nothing?
-                     */
-                    /*if(!vertices.containsAll(scc)) {
-                        testFailed = true;
-                        feedback += "FAILED. Your result did not match line " 
-                                     + (j+1) + " in \"" + answerFile + "\"";
-                        break;
-                    }*/
-
                     // check if learner result constains SCC from answer file
                     if(!sccs.contains(answerSCC)) {
                         if(!testFailed) {
@@ -130,7 +108,7 @@ public class SCCGrader extends Grader {
                         }
                         feedback += "Your result did not contain the scc on line "
                                      + (j+1) + " in \"" + answerFile + "\"";
-                        feedback += "\\n";
+                        feedback += "\n";
                         testsPassed--;
                     }
 
@@ -144,7 +122,7 @@ public class SCCGrader extends Grader {
                         for(Integer id : scc) {
                             feedback += id + " ";
                         }
-                        feedback += "\\n";
+                        feedback += "\n";
                         testsPassed--;
                     }
 
@@ -162,7 +140,7 @@ public class SCCGrader extends Grader {
                         for(Integer id : scc) {
                             feedback += id + " ";
                         }
-                        feedback += "\\n";
+                        feedback += "\n";
                         testsPassed--;
                     }
 
@@ -178,7 +156,7 @@ public class SCCGrader extends Grader {
             System.out.println("total Tests : " + totalTests);
             System.out.println("testsPassed : " + testsPassed);
         } catch (Exception e) {
-            feedback = "An error occurred during runtime.\\n" + feedback + "\\nError during runtime: " + e;
+            feedback = "An error occurred during runtime.\n" + feedback + "\nError during runtime: " + e;
         }
     }
 }

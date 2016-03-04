@@ -34,23 +34,15 @@ public class EgoGrader extends Grader {
         if (infinite) {
             grader.feedback += "Your program entered an infinite loop or took longer than 30 seconds to finish.";
         }
-        grader.out.println(makeJson((double)grader.correct / TESTS, grader.feedback));
-        grader.out.close();
+        System.out.println(makeOutput((double)grader.correct / TESTS, grader.feedback));
     }
 
     @Override
     public void run() {
         try {
-            out = new PrintWriter("output.out");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        try {
             Graph graph = new CapGraph();
             GraphLoader.loadGraph(graph, "data/facebook_ucsd.txt");
-            feedback += "\\nGRAPH: facebook_ucsd.txt\\nFailed tests will display the first mismatched lines of the output.\\n";
+            feedback += "\nGRAPH: facebook_ucsd.txt\nFailed tests will display the first mismatched lines of the output.\n";
             for (int i = 0; i < 10; i++) {
                 feedback += appendFeedback(i + 1, "Starting from node " + i);
                 // Run user's implementation and turn the output into readable strings
@@ -62,7 +54,7 @@ public class EgoGrader extends Grader {
                 while ((next = br.readLine()) != null) {
                     // Compare answers line by line
                     if (!next.equals(res[count])) {
-                        feedback += "FAILED. Expected \\\"" + next + "\\\", got \\\"" + res[count] + "\\\".";
+                        feedback += "FAILED. Expected \"" + next + "\", got \"" + res[count] + "\".";
                         failed = true;
                         break;
                     }
@@ -74,7 +66,7 @@ public class EgoGrader extends Grader {
                 }
             }
         } catch (Exception e) {
-            feedback = "An error occurred during runtime.\\n" + feedback + "\\nError during runtime: " + e;
+            feedback = "An error occurred during runtime.\n" + feedback + "\nError during runtime: " + e;
         }
     }
 }
