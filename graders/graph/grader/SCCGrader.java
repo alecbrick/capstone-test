@@ -1,3 +1,10 @@
+/**
+ * @author UCSD MOOC development team
+ * 
+ * Grader for the SCC assignment.
+ *
+ */
+
 package graph.grader;
 
 import java.io.BufferedReader;
@@ -55,7 +62,7 @@ public class SCCGrader extends Grader {
                 Graph g = new CapGraph();
                 Set<Integer> vertices;
 
-                String answerFile = "data/sccAnswers/answer" + (i + 1);
+                String answerFile = "data/scc_answers/answer" + (i + 1);
                 GraphLoader.loadGraph(g, "data/scc/T" + (i +1));
                 BufferedReader br = new BufferedReader(new FileReader(answerFile));
                 feedback += appendFeedback(i + 1, "\\nGRAPH: T" + (i + 1));
@@ -100,18 +107,6 @@ public class SCCGrader extends Grader {
                         scc = sccs.get(j);
                     }
                         
-                    //vertices = answer.get(j);
-
-                    
-                    /* QUESTION ::: how should credit be given? i
-                     * partial, all or nothing?
-                     */
-                    /*if(!vertices.containsAll(scc)) {
-                        testFailed = true;
-                        feedback += "FAILED. Your result did not match line " 
-                                     + (j+1) + " in \"" + answerFile + "\"";
-                        break;
-                    }*/
 
                     // check if learner result constains SCC from answer file
                     if(!sccs.contains(answerSCC)) {

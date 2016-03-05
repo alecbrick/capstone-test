@@ -6,14 +6,13 @@
  *
  */
 
-package graph.grader;
+package graph;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import util.GraphLoader;
-import graph.CapGraph;
-import graph.Graph;
+import graph.grader.Grader;
 
 public class EgoGrader extends Grader {
     private static final int TESTS = 10;
