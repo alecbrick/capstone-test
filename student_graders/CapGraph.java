@@ -329,7 +329,7 @@ public class CapGraph implements Graph {
         //g.partition(amount);
 
         List<Set<Integer>> sccs = g.getSCCs();
-        
+        /*
 
         for(int i = 0; i < sccs.size(); i++) {
             Set<Integer> scc = sccs.get(i);
@@ -339,12 +339,12 @@ public class CapGraph implements Graph {
             }
             System.out.print("\n");
         }
-        
+        */
 
-        /*List<Vertex> ret = g.findPossibleFriends(1);
+        List<Vertex> ret = g.findPossibleFriends(1);
         for (Vertex v : ret) {
             System.out.println(v.getVal());
-        }*/
+        }
 
             
 
