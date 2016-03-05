@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.Scanner;
+import graph.CapGraph;
+import graph.Graph;
 
 public class SCCGrader extends Grader {
     private int totalTests;
@@ -50,7 +52,7 @@ public class SCCGrader extends Grader {
         try {
             
             for(int i = 0; i < 10; i++) {
-                CapGraph g = new CapGraph();
+                Graph g = new CapGraph();
                 Set<Integer> vertices;
 
                 String answerFile = "data/sccAnswers/answer" + (i + 1);
@@ -66,11 +68,7 @@ public class SCCGrader extends Grader {
                     Scanner sc = new Scanner(line);
                     vertices = new TreeSet<Integer>();
                     while(sc.hasNextInt()) {
-
-                        // DEBUG !!!!
-                        if(!vertices.add(sc.nextInt())) {
-                            System.out.print("error adding to solution TreeSet");
-                        }
+                        vertices.add(sc.nextInt());
                     }
                     answer.add(vertices);
 
@@ -168,8 +166,6 @@ public class SCCGrader extends Grader {
 
                 br.close();
             }
-            System.out.println("total Tests : " + totalTests);
-            System.out.println("testsPassed : " + testsPassed);
         } catch (Exception e) {
             feedback = "An error occurred during runtime.\\n" + feedback + "\\nError during runtime: " + e;
         }
