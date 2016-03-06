@@ -31,7 +31,7 @@ public class CapGraph implements Graph {
     public CapGraph(List<Vertex> allowed) {
         vertices = new HashMap<Integer, Vertex>();
         for (Vertex v : allowed) {
-            vertices.put(v.getVal(), v);
+            vertices.put(v.getVal(), new Vertex(v, allowed));
         }
     }
 
