@@ -46,15 +46,29 @@ public class EgoGrader extends Grader {
             for (int i = 0; i < 10; i++) {
                 feedback += appendFeedback(i + 1, "Starting from node " + i);
                 // Run user's implementation and turn the output into readable strings
-                String[] res = graph.getEgonet(i).printGraph().split("\n");
+                HashMap<Integer, HashSet<Integer>> res = graph.getEgonet(i).exportGraph();
                 BufferedReader br = new BufferedReader(new FileReader("data/ego_answers/ego_" + i + ".txt"));
                 String next;
                 int count = 0;
                 boolean failed = false;
                 while ((next = br.readLine()) != null) {
-                    // Compare answers line by line
-                    if (!next.equals(res[count])) {
-                        feedback += "FAILED. Expected \"" + next + "\", got \"" + res[count] + "\".";
+                    next = next.replaceAll("[:,]", " ");
+                    Scanner sc = new Scanner(next);
+                    int vertex = sc.nextInt();
+                    HashSet<Integer> others = res.get(vertex);
+                    if (others == null) {
+                        feedback += "FAILED. Egonet does not include vertex " + vertex + ".";
+                        failed = true;
+                        break;
+                    }
+
+                    HashSet<Integer> check = new HashSet<Integer>();
+                    while(sc.hasNextInt()) {
+                        check.add(sc.nextInt());
+                    }
+                    
+                    if (!check.equals(others)) {
+                        feedback += "FAILED. Expected \\\"" + next + "\\\" for vertex #" + vertex + ", got \\\"" + others + "\\\".";
                         failed = true;
                         break;
                     }
@@ -67,6 +81,7 @@ public class EgoGrader extends Grader {
             }
         } catch (Exception e) {
             feedback = "An error occurred during runtime.\n" + feedback + "\nError during runtime: " + e;
+            e.printStackTrace();
         }
     }
 }

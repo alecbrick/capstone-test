@@ -1,5 +1,7 @@
 package graph;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +19,6 @@ public interface Graph {
      * this for undirected graphs. */
     public List<Set<Integer>> getSCCs();
     
-    /* Return the graph's connections in a printable format. */
-    public String printGraph();
+    /* Return the graph's connections in a readable format. */
+    public HashMap<Integer, HashSet<Integer>> exportGraph();
 } 
