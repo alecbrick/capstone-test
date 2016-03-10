@@ -39,6 +39,7 @@ public class EgoGrader extends Grader {
         System.out.println(makeOutput((double)grader.correct / TESTS, grader.feedback));
     }
 
+    /* Main grading method */
     @Override
     public void run() {
         try {
@@ -47,17 +48,21 @@ public class EgoGrader extends Grader {
             feedback += "\nGRAPH: facebook_ucsd.txt\nFailed tests will display the first mismatched lines of the output.\n";
             for (int i = 0; i < 10; i++) {
                 feedback += appendFeedback(i + 1, "Starting from node " + i);
-                // Run user's implementation and turn the output into readable strings
+                // Run user's implementation and make the output readable
                 HashMap<Integer, HashSet<Integer>> res = graph.getEgonet(i).exportGraph();
                 BufferedReader br = new BufferedReader(new FileReader("data/ego_answers/ego_" + i + ".txt"));
                 String next;
                 int count = 0;
                 boolean failed = false;
+                // Scan though the file
                 while ((next = br.readLine()) != null) {
+                    // Punctuation is for readability and doesn't help us
                     next = next.replaceAll("[:,]", " ");
                     Scanner sc = new Scanner(next);
                     int vertex = sc.nextInt();
                     HashSet<Integer> others = res.get(vertex);
+
+                    // If vertex is present, should return a list
                     if (others == null) {
                         feedback += "FAILED. Egonet does not include vertex " + vertex + ".";
                         failed = true;
@@ -69,8 +74,9 @@ public class EgoGrader extends Grader {
                         check.add(sc.nextInt());
                     }
                     
+                    // Sets should be equal
                     if (!check.equals(others)) {
-                        feedback += "FAILED. Expected \\\"" + next + "\\\" for vertex #" + vertex + ", got \\\"" + others + "\\\".";
+                        feedback += "FAILED. Expected \"" + next + "\" for vertex #" + vertex + ", got \"" + others + "\".";
                         failed = true;
                         break;
                     }

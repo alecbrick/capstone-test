@@ -31,6 +31,7 @@ public class SCCGrader extends Grader {
         SCCGrader grader = new SCCGrader();
         Thread thread = new Thread(grader);
         thread.start();
+        // Infinite loop detection
         long endTime = System.currentTimeMillis() + 30000;
         boolean infinite = false;
         while (thread.isAlive()) {

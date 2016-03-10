@@ -24,7 +24,4 @@ public abstract class Grader implements Runnable {
         return "\n**Test #" + num + ": " + test + "...";
     }
 
-    
-    /* Required for threads 
-    public abstract void run(); */
 }
