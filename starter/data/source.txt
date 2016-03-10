@@ -1,0 +1,3 @@
+Facebook: https://archive.org/details/oxford-2005-facebook-matrix
+Twitter: http://snap.stanford.edu/data/higgs-twitter.html
+         https://snap.stanford.edu/data/egonets-Twitter.html
