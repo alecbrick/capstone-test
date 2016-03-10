@@ -13,7 +13,10 @@ import java.io.PrintWriter;
 import util.GraphLoader;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.TreeSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Scanner;
 import graph.CapGraph;
@@ -86,8 +89,19 @@ public class SCCGrader extends Grader {
                 
 
                 // get student SCC result
-                List<Set<Integer>> sccs = g.getSCCs();
+                List<Graph> graphSCCs = g.getSCCs();
+                
+                List<Set<Integer>> sccs = new ArrayList<Set<Integer>>();
 
+                for(Graph graph : graphSCCs) {
+                    HashMap<Integer, HashSet<Integer>> curr = graph.exportGraph();
+                    TreeSet<Integer> scc = new TreeSet<Integer>();
+                    for (Map.Entry<Integer, HashSet<Integer>> entry : curr.entrySet()) {
+                        scc.add(entry.getKey());
+                    }
+                    sccs.add(scc);
+                }
+                       
 
                 boolean testFailed = false;
                 totalTests += answer.size() + sccs.size(); 

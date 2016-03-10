@@ -67,6 +67,7 @@ public class CapGraph implements Graph {
         
         for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
             Vertex v = entry.getValue();
+
             System.out.print("\n"+v.getVal() + " : ");
             
             for(Edge edge : v.getEdges()) {
@@ -89,6 +90,77 @@ public class CapGraph implements Graph {
         return ret;
     }
     
+    public void readEdges(String file) {
+        Scanner sc;
+        try {
+            sc = new Scanner(new File(file));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine().replaceAll(":", "");
+            Scanner numSc = new Scanner(line);
+            int i1 = numSc.nextInt();
+            this.insert(i1);
+            while (numSc.hasNextInt()) {
+                int i2 = numSc.nextInt();
+                this.insert(i2);
+                this.getVertex(i1).addEdge(this.getVertex(i2));
+            }
+            numSc.close();
+        }
+        sc.close();
+    }
+
+    public double calculateDensity(List<Vertex> allowed) {
+        int edges = 0;
+        for (Vertex v : allowed) {
+            edges += v.getEdgeCount(allowed);
+        }
+        return edges * 1.0 / allowed.size();
+    }
+            
+
+    /**
+     * Given a vertex, find the most dense subgraph containing it.
+     * This measures the connectivity between vertices.
+     * This is a greedy algorithm from On Finding Dense Subgraphs
+     * by Khuller and Saha. Note that this is not necessarily the
+     * largest subgraph, but it will come close.
+     */
+    public List<Vertex> largestDenseNetwork(int start) {
+        return largestDenseNetwork(this.getVertex(start));   
+    }
+
+    public List<Vertex> largestDenseNetwork(Vertex start) {
+        CapGraph g = new CapGraph(start.getNeighborsAndThis());
+        List<Vertex> neighbors = new ArrayList<Vertex>(g.getVertices().values());
+        Collections.sort(neighbors, Vertex.VertexComparator);
+        List<Vertex> ret = new ArrayList<Vertex>();
+        double density = 0;
+
+        boolean first = false;
+        for (Vertex v : neighbors) {
+            ret.add(v);
+            if (!first) {
+                first = true;
+                continue;
+            }
+            double currDensity = calculateDensity(ret);
+            if (currDensity <= density) {
+                ret.remove(v);
+            } else {
+                density = currDensity;
+            }
+        }
+
+        for (int i = 0; i < ret.size(); i++) {
+            ret.set(i, this.getVertex(ret.get(i).getVal()));
+        }
+        return ret;
+    }
+
     public static void printList(List<Vertex> lst) {
         System.out.print("[");
         for (Vertex v : lst) {
@@ -97,12 +169,27 @@ public class CapGraph implements Graph {
         System.out.println("]");
     }
 
+    public List<Vertex> findFriends(int start) {
+        // Get dense network around start subgraph
+        List<Vertex> startSubgraph = largestDenseNetwork(start);
+        printList(startSubgraph);
+
+        // Highest degree of start subgraph
+        Vertex highest = getLargestDegree(startSubgraph, start);
+        // Dense network around highest degree node
+        List<Vertex> highSubgraph = largestDenseNetwork(highest);
+        printList(highSubgraph);
+
+        // Find the nodes that the start network doesn't have
+        Set<Vertex> startSet = new HashSet<Vertex>(startSubgraph);
+        Set<Vertex> highSet = new HashSet<Vertex>(highSubgraph);
+        System.out.println(highSet.removeAll(startSet));
+        return new ArrayList<Vertex>(highSet);
+    }
 
     public Map<Integer, Vertex> getVertices() {
         return vertices;
     }
-
-    // NETWORK PARTITIONING =======================================
 
     // BFS through the graph, keeping track of path count and layer.
     public List<Vertex> bfs(Vertex start) {
@@ -120,8 +207,6 @@ public class CapGraph implements Graph {
                 for (Edge e : curr.getEdges()) {
                     Vertex neighbor = e.getOtherVertex(curr);
                     if (!neighbor.visited) {
-                        // The layer is the shortest distance to the
-                        // starting vertex.
                         if (neighbor.layer == 0) {
                             neighbor.layer = curr.layer + 1;
                         }
@@ -137,7 +222,6 @@ public class CapGraph implements Graph {
         return ret;
     }
 
-    // Find the flow for each vertex and edge for this iteration.
     public void findFlow() {
         // so in-place sort doesn't mess up old order
         List<Vertex> vertexCopy = new ArrayList<Vertex>(((HashMap<Integer, Vertex>)vertices).values());
@@ -152,7 +236,6 @@ public class CapGraph implements Graph {
         }
     }
 
-    // Find the most-travelled edges on the graph, and remove them.
     public void findPartitions() {
         // Calculate flow from each vertex
         for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
@@ -165,7 +248,6 @@ public class CapGraph implements Graph {
         float max = 0;
         Edge maxEdge = null;
 
-        // Find the edge with the highest flow
         for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
             Vertex v = entry.getValue();
             for (Edge e : v.getEdges()) {
@@ -178,6 +260,7 @@ public class CapGraph implements Graph {
 
         // partition
         Edge e = maxEdge;
+        System.out.println(e.getV1().getVal() + " to " + e.getV2().getVal() + ": " + e.flow);
         e.getV1().removeEdge(e.getV2());
         e.getV2().removeEdge(e.getV1());
     }
@@ -190,7 +273,6 @@ public class CapGraph implements Graph {
         }
     }
 
-    // Clears flow information on edges
     public void resetEdges() {
         for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
             Vertex v = entry.getValue();
@@ -200,21 +282,24 @@ public class CapGraph implements Graph {
         }
     }
 
-    // Remove edges from the graph in order to separate it into
-    // "amount" subcommunities
     public void partition(int amount) {
         int count = countPartitions();
         while (count < amount) {
             count = 0;
-            // Find and remove the highest-travelled edge
             findPartitions();
+            resetVertices();
             resetEdges();
-            count = countPartitions();
+            for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
+                Vertex v = entry.getValue();
+                if (!v.visited) {
+                    count++;
+                    bfs(v);
+                }
+            }
         }
 
         count = 0;
         resetVertices();
-        // Print out connected components
         for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
             Vertex v = entry.getValue();
             if (!v.visited) {
@@ -226,13 +311,11 @@ public class CapGraph implements Graph {
         }
     } 
 
-    // Count number of connected components in the graph
     public int countPartitions() {
         int count = 0;
         resetVertices();
         for (Map.Entry<Integer, Vertex> entry : vertices.entrySet()) {
             Vertex v = entry.getValue();
-            // Do BFS from non-visited nodes as they are found
             if (!v.visited) {
                 count++;
                 bfs(v);
@@ -242,7 +325,7 @@ public class CapGraph implements Graph {
     }
 
     public static void main(String[] args) {
-        String filename = "facebook_1000.txt";
+        String filename = "facebook_ucsd.txt";
         int amount = 2;
         if (args.length > 0) {
             if (args[0].equals("--help")) {
@@ -256,7 +339,31 @@ public class CapGraph implements Graph {
         }
         CapGraph g = new CapGraph();
         GraphLoader.loadGraph(g, "data/" + filename);
-        g.partition(amount);
+        //g.partition(amount);
+
+        List<Graph> sccs = g.getSCCs();
+        
+        int count = 1;
+        for(Graph graph : sccs) {
+            HashMap<Integer, HashSet<Integer>> curr = graph.exportGraph();
+            System.out.print("scc " + count +": ");
+            count++;
+            for (Map.Entry<Integer, HashSet<Integer>> entry : curr.entrySet()) {
+                HashSet<Integer> scc = entry.getValue();
+                System.out.println(scc);
+                //sccs.add(scc);
+            }
+        }
+
+
+        /*List<Vertex> ret = g.findPossibleFriends(1);
+        for (Vertex v : ret) {
+            System.out.println(v.getVal());
+        }*/
+
+            
+
+
     }
 
     // EASY QUESTION ======================================
@@ -308,7 +415,34 @@ public class CapGraph implements Graph {
         return curr;
     }
 
-    // EGONET FINDING ===============================================
+    public String printGraph() {
+        // add vertices to tree map sorted by integer key values
+        TreeMap<Integer, Vertex> newVertices = 
+                new TreeMap<Integer, Vertex>(getVertices());
+        String ret = "";
+
+        for (Map.Entry<Integer, Vertex> entry : newVertices.entrySet()) {
+            Vertex v = entry.getValue();
+            ret += v.getVal() + ": ";
+            List<Edge> newEdges = new ArrayList<Edge>(v.getEdges());
+            Collections.sort(newEdges, new Comparator<Edge>() {
+                @Override
+                public int compare(Edge e1, Edge e2) {
+                    return e1.getV2().getVal() - e2.getV2().getVal();
+                }
+            });
+
+            for (int i = 0; i < newEdges.size(); i++) {
+                ret += newEdges.get(i).getV2().getVal();
+                if (i < newEdges.size() - 1) {
+                    ret += ", ";
+                }
+            }
+            ret += "\n";
+        }
+        return ret;
+    }
+
     public Graph getEgonet(int center) {
         Vertex start = getVertex(center);
         List<Vertex> friends = new ArrayList<Vertex>();
@@ -321,8 +455,8 @@ public class CapGraph implements Graph {
 
     // SCC FINDING ===================================================
 
-    public List<Set<Integer>> getSCCs() {
-        List<Set<Integer>> sccs = new ArrayList<Set<Integer>>();
+    public List<Graph> getSCCs() {
+        List<Graph> sccs = new ArrayList<Graph>();
         CapGraph gReverse = CapGraph.getReverseGraph(this);
         List<Vertex> postList = new ArrayList<Vertex>();
 
@@ -347,10 +481,10 @@ public class CapGraph implements Graph {
     };
 
     // finds SCC given a valid vertex
-    private Set<Integer> findSCC(int val) {
+    private Graph findSCC(int val) {
         
 
-        Set<Integer> scc = new TreeSet<Integer>();
+        Graph scc = new CapGraph();
         Stack<Vertex> stack = new Stack<Vertex>();
         Vertex working = null;
         
@@ -361,7 +495,7 @@ public class CapGraph implements Graph {
             if(!working.visited) {
                 working.visited = true;
                 
-                scc.add(working.getVal());
+                scc.addVertex(working.getVal());
 
 
                 for(Edge edge : working.getEdges()) {

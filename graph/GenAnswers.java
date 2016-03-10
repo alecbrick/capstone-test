@@ -3,7 +3,12 @@ package graph;
 import java.io.PrintWriter;
 import util.GraphLoader;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 
 public class GenAnswers {
@@ -17,9 +22,20 @@ public class GenAnswers {
 
             try {
                 GraphLoader.loadGraph(g, "data/scc/T" + (i +1));
-                PrintWriter pw = new PrintWriter("data/sccAnswers/answer" + (i + 1));
-                List<Set<Integer>> sccs = g.getSCCs();
+                PrintWriter pw = new PrintWriter("data/scc_answers/answer" + (i + 1));
 
+                List<Graph> graphSCCs = g.getSCCs();
+                
+                List<Set<Integer>> sccs = new ArrayList<Set<Integer>>();
+
+                for(Graph graph : graphSCCs) {
+                    HashMap<Integer, HashSet<Integer>> curr = graph.exportGraph();
+                    TreeSet<Integer> scc = new TreeSet<Integer>();
+                    for (Map.Entry<Integer, HashSet<Integer>> entry : curr.entrySet()) {
+                        scc.add(entry.getKey());
+                    }
+                    sccs.add(scc);
+                }
                 // loop over SCCs
                 for(int j = 0; j < sccs.size(); j++) {
 
