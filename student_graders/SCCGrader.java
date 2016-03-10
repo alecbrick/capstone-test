@@ -5,7 +5,7 @@
  *
  */
 
-package graph;
+package graph.grader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.ArrayList;
 import java.util.Scanner;
+import graph.Graph;
+import graph.CapGraph;
 
 public class SCCGrader extends Grader {
     private int totalTests;

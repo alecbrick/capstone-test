@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.TreeSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -16,6 +16,7 @@ import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import util.GraphLoader;
 
 public class CapGraph implements Graph {
@@ -74,7 +75,19 @@ public class CapGraph implements Graph {
             }
             System.out.print("\n");
         }
-        
+    }
+
+    public HashMap<Integer, HashSet<Integer>> exportGraph() {
+        HashMap<Integer, HashSet<Integer>> ret = new HashMap<Integer, HashSet<Integer>>();
+        for (Map.Entry<Integer, Vertex> pair : vertices.entrySet()) {
+            HashSet<Integer> val = new HashSet<Integer>();
+            List<Edge> edges = pair.getValue().getEdges();
+            for (Edge e : edges) {
+                val.add(e.getV2().getVal());
+            }
+            ret.put(pair.getKey(), val);
+        }
+        return ret;
     }
     
     public void readEdges(String file) {

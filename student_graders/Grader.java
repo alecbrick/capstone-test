@@ -5,7 +5,7 @@
  *
  */
 
-package graph;
+package graph.grader;
 
 import java.io.PrintWriter;
 

@@ -5,7 +5,7 @@
  *
  */
 
-package graph;
+package graph.grader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -107,18 +107,6 @@ public class SCCGrader extends Grader {
                         scc = sccs.get(j);
                     }
                         
-                    //vertices = answer.get(j);
-
-                    
-                    /* QUESTION ::: how should credit be given? i
-                     * partial, all or nothing?
-                     */
-                    /*if(!vertices.containsAll(scc)) {
-                        testFailed = true;
-                        feedback += "FAILED. Your result did not match line " 
-                                     + (j+1) + " in \"" + answerFile + "\"";
-                        break;
-                    }*/
 
                     // check if learner result constains SCC from answer file
                     if(!sccs.contains(answerSCC)) {
