@@ -17,7 +17,7 @@ public interface Graph {
 
     /* Returns all SCCs in a directed graph. Don't worry about handling
      * this for undirected graphs. */
-    public List<Graph>> getSCCs();
+    public List<Graph> getSCCs();
     
     /* Return the graph's connections in a readable format. */
     public HashMap<Integer, HashSet<Integer>> exportGraph();
