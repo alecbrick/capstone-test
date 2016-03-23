@@ -36,6 +36,11 @@ public class EgoGrader extends Grader {
                 break;
             }
         }
+        if (grader.correct < TESTS) {
+            grader.feedback = "Some tests failed. Please check the following and try again:\\nFailed tests will display the first mismatched lines of the output.\\n" + grader.feedback;
+        } else {
+            grader.feedback = "All tests passed. Congrats!\\n" + grader.feedback;
+        }
         if (infinite) {
             grader.feedback += "Your program entered an infinite loop or took longer than 30 seconds to finish.";
         }
@@ -55,7 +60,7 @@ public class EgoGrader extends Grader {
         try {
             Graph graph = new CapGraph();
             GraphLoader.loadGraph(graph, "data/facebook_ucsd.txt");
-            feedback += "\\nGRAPH: facebook_ucsd.txt\\nFailed tests will display the first mismatched lines of the output.\\n";
+            feedback += "\\nGRAPH: facebook_ucsd.txt";
             for (int i = 0; i < 10; i++) {
                 feedback += appendFeedback(i + 1, "Starting from node " + i);
                 // Run user's implementation and turn the output into readable strings
@@ -81,9 +86,12 @@ public class EgoGrader extends Grader {
                     }
                     
                     if (!check.equals(others)) {
-                        feedback += "FAILED. Expected \\\"" + next + "\\\" for vertex #" + vertex + ", got \\\"" + others + "\\\".";
-                        failed = true;
-                        break;
+                        check.add(i);
+                        if (!check.equals(others)) {
+                            feedback += "FAILED. Expected \\\"" + check + "\\\" for vertex #" + vertex + ", got \\\"" + others + "\\\".";
+                            failed = true;
+                            break;
+                        }
                     }
                     count++;
                 } 

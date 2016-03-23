@@ -43,6 +43,11 @@ public class SCCGrader extends Grader {
                 break;
             }
         }
+        if (grader.testsPassed < grader.totalTests) {
+            grader.feedback = "Some tests failed. Please check the following and try again:\\n" + grader.feedback;
+        } else {
+            grader.feedback = "All tests passed. Congrats!\\n" + grader.feedback;
+        }
         if (infinite) {
             grader.feedback += "Your program entered an infinite loop or took longer than 30 seconds to finish.";
         }
@@ -129,7 +134,7 @@ public class SCCGrader extends Grader {
                             feedback += "FAILED. ";
                         }
                         feedback += "Your result did not contain the scc on line "
-                                     + (j+1) + " in \"" + answerFile + "\"";
+                                     + (j+1) + " in \\\"" + answerFile + "\\\"";
                         feedback += "\\n";
                         testsPassed--;
                     }
@@ -140,7 +145,7 @@ public class SCCGrader extends Grader {
                             testFailed = true;
                             feedback += "FAILED. ";
                         }
-                        feedback += "Your result contained an extra SCC : ";
+                        feedback += "Your result contained an extra SCC: ";
                         for(Integer id : scc) {
                             feedback += id + " ";
                         }
@@ -158,7 +163,7 @@ public class SCCGrader extends Grader {
                             testFailed = true;
                             feedback += "FAILED. ";
                         }
-                        feedback += "Your result contained an extra SCC : ";
+                        feedback += "Your result contained an extra SCC: ";
                         for(Integer id : scc) {
                             feedback += id + " ";
                         }
